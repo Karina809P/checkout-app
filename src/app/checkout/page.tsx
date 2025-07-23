@@ -149,7 +149,7 @@ const CheckoutPage = () => {
               <p className={styles.payment_content_title}>Payment on receipt</p>
             </div>
             <p className={styles.payment_text}>
-              Avoid online transactions and pay only when you receive your order. This will guarantee
+               Avoid online transactions and pay only when you receive your order. This will guarantee
               your financial security and avoid any risks associated with electronic payments.
             </p>
           </section>
