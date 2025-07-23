@@ -1,0 +1,136 @@
+.footer {
+ background-color: rgba(246, 243, 247, 1);
+  padding: 32px 105px;
+  width: 100%;
+
+  .footerLogoAll{
+    display: flex;
+    align-items: center;
+  }
+  .footerLogo{
+    display: flex;
+    flex-direction: column;
+    margin-left: 11px;
+    align-items: center;
+  }
+
+  .footerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    width: 1440px;
+     background-color: rgba(246, 243, 247, 1);
+    margin: 0 auto;
+    gap: 20px;
+  }
+
+  .footerSection {
+    display: flex;
+    flex-direction: column;
+    
+    
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        
+        cursor: pointer;
+        font-family: Inter;
+       
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 140%;
+        letter-spacing: 0%;
+        color: rgba(6, 40, 35, 1);
+        margin: 0;
+        margin-bottom: 8px;
+
+
+      }
+    }
+
+    p {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+    .sectionTitle{
+    font-family: Inter;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 132%;
+    letter-spacing: 0%;
+    color: rgba(26, 20, 31, 1);
+    margin: 0;
+    margin-bottom: 22px;
+
+
+    }
+  
+
+    .footerSectionC,
+    .footerSectionD{
+        font-family: Inter;
+        font-weight: 600;
+        font-style: Semi Bold;
+        font-size: 16px;
+        line-height: 132%;
+        letter-spacing: 0%;
+        
+
+    }
+     .sectionTitleC,
+     .sectionTitleD{
+        margin: 0;
+        margin-bottom: 16px;
+     }
+    .sectionTitleC_title{
+        display: flex;
+        align-items: center;
+        font-family: Inter;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 14px;
+        line-height: 140%;
+        letter-spacing: 0%;
+        margin: 0;
+        margin-bottom: 10px;
+
+    }
+  .tagline {
+    margin: 0;
+    margin-top: 85px;
+    color: rgba(1, 11, 9, 1);
+
+   width: 187px;
+    font-family: Poppins;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 140%;
+    letter-spacing: 0%;
+
+  }
+
+ 
+  .socials {
+    margin-top: 16px;
+    display: flex;
+    gap: 20px;
+  }
+
+  .apps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+
+  }
+
+  
+  
+}
