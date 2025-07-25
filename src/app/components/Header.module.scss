@@ -189,7 +189,12 @@
 }
 
 
-@media (max-width: 425px) {
+@media (max-width: 426px) {
+  .header{
+   
+    display: flex;
+    flex-wrap: wrap;
+  }
   .burger_button {
     display: flex;
   }
@@ -198,5 +203,16 @@
     display: none;
   }
 }
+
+}
+
+@media (max-width: 321px) {
+ .header{
+   width: 100%;
+   display: flex;
+   flex-wrap: wrap;
+   padding: 20px 10px;
+   
+ }
 
 }

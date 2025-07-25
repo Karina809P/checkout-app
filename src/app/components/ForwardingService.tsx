@@ -1,15 +1,14 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import styles from './ForwardingService.module.scss';
+import React from "react";
+import styles from "./ForwardingService.module.scss";
 
-const ForwardingService = () => {
-  const [enabled, setEnabled] = useState(false);
+interface ForwardingServiceProps {
+  enabled: boolean;
+  onToggle: () => void;
+}
 
-  const toggleSwitch = () => {
-    setEnabled((prev) => !prev);
-  };
-
+const ForwardingService: React.FC<ForwardingServiceProps> = ({ enabled, onToggle }) => {
   return (
     <div className={styles.forwarding}>
       <label className={styles.label}>Forwarding service</label>
@@ -19,7 +18,7 @@ const ForwardingService = () => {
           id="forwardingSwitch"
           className={styles.switchInput}
           checked={enabled}
-          onChange={toggleSwitch}
+          onChange={onToggle}
         />
         <label htmlFor="forwardingSwitch" className={styles.switchSlider} />
       </div>

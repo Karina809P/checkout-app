@@ -1,121 +1,151 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import ThemeToggle from "../components/ThemeToggle";
+import Image from "next/image";
 import styles from "./page.module.scss";
 import ContactInfoSection from "../components/ContactInfoSection";
 import OrderSidebar from "../components/OrderSidebar";
 import RouteForm from "../components/RouteForm";
-import Image from "next/image";
 import CargoSection from "../components/CargoSection";
 import CommentInput from "../components/CommentInput";
-import { geocodeAddress, getRouteDistance } from "@/lib/orsApi";
-
-interface Point {
-  label: string;
-  type: "Download location" | "Place of unloading" | "Additional point";
-  location: string;
-  time: string;
-}
+import { Point } from "@/types/point";
 
 const loadingPrice = 500;
 const forwardingPrice = 250;
 const commission = 35;
-const pricePerKm = 10; // THB за км
-const pricePerKg = 20; // THB за кг
+const pricePerKg = 20;
 
-const CheckoutPage = () => {
+export default function CheckoutPage() {
+  // 1. Ініціалізація станів з дефолтними значеннями (без localStorage)
   const [points, setPoints] = useState<Point[]>([
-    { type: "Download location", label: "Point A", location: "", time: "" },
-    { type: "Place of unloading", label: "Point B", location: "", time: "" },
+    { type: "Download location", label: "Point A", location: "", operatingTime: "" },
+    { type: "Place of unloading", label: "Point B", location: "", operatingTime: "" },
   ]);
 
-  const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const [cost, setCost] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [distance, setDistance] = useState<number>(0);
+  const [operatingCost, setOperatingCost] = useState<number>(0);
 
   const [weight, setWeight] = useState<number>(0);
   const [cargoType, setCargoType] = useState<string>("");
   const [sizeL, setSizeL] = useState<string>("");
   const [sizeW, setSizeW] = useState<string>("");
   const [sizeH, setSizeH] = useState<string>("");
+  const [sizeUnit, setSizeUnit] = useState<"m" | "cm">("m");
 
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-   const [comment, setComment] = useState("");
+  const [comment, setComment] = useState("");
 
+  const [forwardingEnabled, setForwardingEnabled] = useState(false);
+
+  // 2. Після монтування компонента завантажуємо значення з localStorage
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const storedPoints = localStorage.getItem("points");
+    if (storedPoints) setPoints(JSON.parse(storedPoints));
+
+    const storedWeight = localStorage.getItem("weight");
+    if (storedWeight) setWeight(Number(storedWeight));
+
+    const storedCargoType = localStorage.getItem("cargoType");
+    if (storedCargoType) setCargoType(storedCargoType);
+
+    setSizeL(localStorage.getItem("sizeL") || "");
+    setSizeW(localStorage.getItem("sizeW") || "");
+    setSizeH(localStorage.getItem("sizeH") || "");
+    setSizeUnit((localStorage.getItem("sizeUnit") as "m" | "cm") || "m");
+
+    setDate(localStorage.getItem("date") || "");
+    setTime(localStorage.getItem("time") || "");
+    setComment(localStorage.getItem("comment") || "");
+
+    const storedForwarding = localStorage.getItem("forwardingEnabled");
+    if (storedForwarding) setForwardingEnabled(JSON.parse(storedForwarding));
+  }, []);
+
+  // 3. Збереження станів у localStorage при оновленні
+  useEffect(() => {
+    localStorage.setItem("points", JSON.stringify(points));
+  }, [points]);
+
+  useEffect(() => {
+    localStorage.setItem("weight", weight.toString());
+  }, [weight]);
+
+  useEffect(() => {
+    localStorage.setItem("cargoType", cargoType);
+  }, [cargoType]);
+
+  useEffect(() => {
+    localStorage.setItem("sizeL", sizeL);
+  }, [sizeL]);
+
+  useEffect(() => {
+    localStorage.setItem("sizeW", sizeW);
+  }, [sizeW]);
+
+  useEffect(() => {
+    localStorage.setItem("sizeH", sizeH);
+  }, [sizeH]);
+
+  useEffect(() => {
+    localStorage.setItem("sizeUnit", sizeUnit);
+  }, [sizeUnit]);
+
+  useEffect(() => {
+    localStorage.setItem("date", date);
+  }, [date]);
+
+  useEffect(() => {
+    localStorage.setItem("time", time);
+  }, [time]);
+
+  useEffect(() => {
+    localStorage.setItem("comment", comment);
+  }, [comment]);
+
+  useEffect(() => {
+    localStorage.setItem("forwardingEnabled", JSON.stringify(forwardingEnabled));
+  }, [forwardingEnabled]);
+
+  // Валідація форми
   const isFormValid =
     points[0].location.trim() !== "" &&
     points[1].location.trim() !== "" &&
     date.trim() !== "" &&
     time.trim() !== "" &&
-    cargoType.trim() !== "";
+    cargoType.trim() !== "" &&
+    points.every((p) => (p.operatingTime ?? "").trim() !== "");
 
-  const calculateDistance = async () => {
-    const pointLocations = points.map((p) => p.location.trim()).filter(Boolean);
-
-    if (pointLocations.length < 2) {
-      alert("Введіть принаймні дві точки маршруту");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      
-      const coords: [number, number][] = [];
-      for (const loc of pointLocations) {
-        const coord = await geocodeAddress(loc);
-        if (!coord) {
-          alert(`Не вдалося знайти адресу: ${loc}`);
-          setLoading(false);
-          return;
-        }
-        coords.push(coord);
-      }
-
-     
-      const distKm = await getRouteDistance(coords);
-      setDistanceKm(distKm);
-
-      
-      const totalCost =
-        distKm * pricePerKm +
-        loadingPrice +
-        forwardingPrice +
-        commission +
-        weight * pricePerKg;
-
-      setCost(totalCost);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert("Помилка при розрахунку: " + error.message);
-      } else {
-        alert("Помилка при розрахунку: " + String(error));
-      }
-    } finally {
-      setLoading(false);
-    }
+  // Обчислення загальної вартості
+  const handleSetCalculatedCost = (baseCost: number) => {
+    const forwardingCost = forwardingEnabled ? forwardingPrice : 0;
+    const totalCost =
+      baseCost + loadingPrice + forwardingCost + commission + weight * pricePerKg;
+    setCost(totalCost);
   };
 
   return (
     <div className={styles.checkout}>
       <h1 className={styles.title}>Checkout</h1>
+      <ThemeToggle />
       <div className={styles.layout}>
         <div className={styles.left}>
-          <RouteForm points={points} setPoints={setPoints} />
+          <RouteForm
+            points={points}
+            setPoints={setPoints}
+            setCalculatedCost={handleSetCalculatedCost}
+            setDistance={setDistance}
+            setOperatingCost={setOperatingCost}
+            forwardingEnabled={forwardingEnabled}
+          />
 
-          <button
-            onClick={calculateDistance}
-            className={styles.calculate_button}
-            disabled={loading}
-            style={{ margin: "15px 0", padding: "10px", width: "100%" }}
-          >
-            {loading ? "Calculation..." : "Calculate the cost of delivery"}
-          </button>
-
-          {distanceKm !== null && <p>Відстань: {distanceKm.toFixed(2)} км</p>}
-          {cost !== null && <p>Загальна вартість: {cost.toFixed(2)} THB</p>}
+          {cost !== null && (
+            <p className={styles.result_text}>Загальна вартість: {cost.toFixed(2)} THB</p>
+          )}
 
           <CargoSection
             weight={weight}
@@ -128,17 +158,20 @@ const CheckoutPage = () => {
             setSizeL={setSizeL}
             setSizeW={setSizeW}
             setSizeH={setSizeH}
+            sizeUnit={sizeUnit}
+            setSizeUnit={setSizeUnit}
             date={date}
             setDate={setDate}
             time={time}
             setTime={setTime}
+            forwardingEnabled={forwardingEnabled}
+            setForwardingEnabled={setForwardingEnabled}
+            setPoints={setPoints}
           />
 
           <CommentInput comment={comment} setComment={setComment} />
           <ContactInfoSection />
 
-
-          {/* Payment section під ContactInfoSection */}
           <section className={styles.payment_all}>
             <div className={styles.payment}>
               <Image src="/images/Vector.png" alt="" width={9} height={16} />
@@ -149,17 +182,26 @@ const CheckoutPage = () => {
               <p className={styles.payment_content_title}>Payment on receipt</p>
             </div>
             <p className={styles.payment_text}>
-               Avoid online transactions and pay only when you receive your order. This will guarantee
-              your financial security and avoid any risks associated with electronic payments.
+              Avoid online transactions and pay only when you receive your order. This guarantees
+              financial security and avoids risks associated with electronic payments.
             </p>
           </section>
         </div>
 
-       
-        <OrderSidebar isFormValid={isFormValid} calculatedPrice={cost ?? undefined} />
+        <OrderSidebar
+          isFormValid={isFormValid}
+          calculatedPrice={cost ?? undefined}
+          distance={distance}
+          points={points.map((p) => ({
+            label: p.label,
+            location: p.location,
+          }))}
+          time={time}
+          forwardingEnabled={forwardingEnabled}
+          weight={weight}
+          operatingCost={operatingCost}
+        />
       </div>
     </div>
   );
-};
-
-export default CheckoutPage;
+}

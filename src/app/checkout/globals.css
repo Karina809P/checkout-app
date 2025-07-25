@@ -24,3 +24,40 @@ body {
   color: var(--foreground);
   font-family: Inter, Helvetica, sans-serif;
 } */
+
+:root {
+  --color-bg: #fff;
+  --color-text: #000;
+  --color-accent: #D128A1;
+}
+
+[data-theme="dark"] {
+  --color-bg: #1e1e1e;
+  --color-text: #ffffff;
+  --color-accent: #FF80BF;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+label,
+button,
+input,
+textarea,
+span,
+li,
+td,
+th {
+  color: var(--color-text);
+}

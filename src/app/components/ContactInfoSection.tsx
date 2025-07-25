@@ -1,14 +1,41 @@
 "use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import styles from '../checkout/page.module.scss';
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import styles from "../checkout/page.module.scss";
 
 export default function ContactInfoSection() {
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState('Marvin McKinney');
-  const [email, setEmail] = useState('example@mail.com');
-  const [phone, setPhone] = useState('+66123456789');
+
+  const [name, setName] = useState("Marvin McKinney");
+  const [email, setEmail] = useState("example@mail.com");
+  const [phone, setPhone] = useState("+66123456789");
+
+  // Завантаження даних з localStorage після монтування
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedName = localStorage.getItem("contact_name");
+      const storedEmail = localStorage.getItem("contact_email");
+      const storedPhone = localStorage.getItem("contact_phone");
+
+      if (storedName) setName(storedName);
+      if (storedEmail) setEmail(storedEmail);
+      if (storedPhone) setPhone(storedPhone);
+    }
+  }, []);
+
+  // Збереження в localStorage при зміні станів
+  useEffect(() => {
+    localStorage.setItem("contact_name", name);
+  }, [name]);
+
+  useEffect(() => {
+    localStorage.setItem("contact_email", email);
+  }, [email]);
+
+  useEffect(() => {
+    localStorage.setItem("contact_phone", phone);
+  }, [phone]);
 
   const handleSave = () => setIsEditing(false);
 
@@ -65,7 +92,9 @@ export default function ContactInfoSection() {
           className={styles.contact_edit}
           onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
         >
-          {isEditing ? 'Save' : 'Edit'}
+          <span className={styles.buttonText}>
+            {isEditing ? "Save" : "Edit"}
+          </span>
           <Image src="/images/edit-contained.svg" alt="Edit" width={16} height={16} />
         </button>
       </div>
